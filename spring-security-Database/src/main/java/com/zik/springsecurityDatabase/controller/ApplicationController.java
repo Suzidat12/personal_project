@@ -11,4 +11,9 @@ public class ApplicationController {
     public String process(){
         return "passed the string security to database";
     }
+
+    @GetMapping("/confirm")
+    public String confirm(){
+        return "Success is yours";
+    }
 }
