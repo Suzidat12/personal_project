@@ -1,0 +1,81 @@
+package swipe.ng.adminservice.report;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import swipe.ng.adminservice.dto.adhon.CardTransactionReport;
+import swipe.ng.adminservice.utils.ReportUtil;
+
+
+
+/**
+ *
+ * @author hp
+ */
+public class CardTransactionExcelReport {
+    public static ByteArrayInputStream generateDailycardReportExcel(List<CardTransactionReport> list) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String extension = "file.xls";
+        Workbook wb = getWorkbook(extension);
+        Sheet sheet = wb.createSheet("cardtransactionReport");
+        createBody(sheet, list);
+        wb.write(out);
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+    public static Workbook getWorkbook(String excelFilePath)
+            throws IOException {
+        Workbook workbook = null;
+
+        if (excelFilePath.endsWith("xlsx")) {
+            workbook = new XSSFWorkbook();
+        } else if (excelFilePath.endsWith("xls")) {
+            workbook = new HSSFWorkbook();
+        } else {
+            throw new IllegalArgumentException("The specified file is not Excel file");
+        }
+
+        return workbook;
+    }
+     public static void createHeader(Row row) {
+        ReportUtil.createContent(row, null, "NAME ON CARD", 0);
+        ReportUtil.createContent(row, null, "AMOUNT", 1);
+        ReportUtil.createContent(row, null, "PRODUCT", 2);
+        ReportUtil.createContent(row, null, "NARATION", 3);
+        ReportUtil.createContent(row, null, "CREATED AT", 4);
+        ReportUtil.createContent(row, null, "STATUS", 5);
+        ReportUtil.createContent(row, null, "CURRENCY", 6);
+    }
+     private static void writeReport(CardTransactionReport rs, Row row) {
+        ReportUtil.createContent(row, null, rs.getNameoncard() + "", 0);
+        ReportUtil.createContent(row, null, rs.getAmount()+ "", 1);
+        ReportUtil.createContent(row, null, rs.getProduct(), 2);
+        ReportUtil.createContent(row, null, rs.getNarration(), 3);
+        ReportUtil.createContent(row, null, rs.getCreated_at(), 4);
+        ReportUtil.createContent(row, null, rs.getStatus(), 5);
+        ReportUtil.createContent(row, null, rs.getCurrency(), 6);
+    }
+    
+    public static void createBody(Sheet sheet, List<CardTransactionReport> list) {
+        CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+        Font font = sheet.getWorkbook().createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        cellStyle.setFont(font);
+        Row rw = sheet.createRow(0);
+        createHeader(rw);
+        int rowcount = 1;
+        for (CardTransactionReport rs : list) {
+            Row row = sheet.createRow(rowcount++);
+            writeReport(rs, row);
+        }
+
+    }
+}

@@ -1,0 +1,354 @@
+public class DailyTransactionReport {
+//    @Autowired
+//    NativeQueryService service;
+   
+     public static ByteArrayInputStream generatedailycardPDFReport(List<Dailytransactionreport> datalist,String logo) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            Style style = new Style();
+            style.setBackgroundColor(Color.convertRgbToCmyk(new DeviceRgb(74, 20, 140)));
+
+            PdfWriter writer = new PdfWriter(out);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf, PageSize.A4.rotate());
+            //////////params
+            PdfFont f2 = PdfFontFactory.createFont(FontConstants.HELVETICA);
+            PdfFont f1 = PdfFontFactory.createFont(FontConstants.HELVETICA_BOLD);
+
+            document.setMargins(20, 35, 20, 35);
+            document.add(createDHeader());
+            createdHeader(document, logo);
+            document.add(createHeader2());
+            createContent(document, datalist);
+            document.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Dailytransactionreport.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Dailytransactionreport.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Dailytransactionreport.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+     
+     public static Paragraph createDHeader(){
+        SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss a");
+        Paragraph p = new Paragraph();
+        p.setWidthPercent(30);
+
+        Paragraph p1 = getPage(25);
+        p1.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        p1.setTextAlignment(TextAlignment.RIGHT);
+        p1.add("Date:" + "\n");
+        p.add(p1);
+
+        p1 = getPage(75);
+        p1.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+        p1.setTextAlignment(TextAlignment.RIGHT);
+        p1.add(f.format(new Date()) + "\n");
+        p.add(p1);
+        
+        p.setTextAlignment(TextAlignment.RIGHT);
+        p.setHorizontalAlignment(HorizontalAlignment.RIGHT);
+
+        return p;
+   }  
+     
+     public static Paragraph buildBody(Dailytransactionreport rs) {
+        Paragraph p = new Paragraph();
+        p.setWidthPercent(100);
+        p.setFontSize(10);
+        Paragraph p1 = getPage(19);
+        p1.add(rs.getName() + "");
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(19);
+        p1.add(rs.getDescription());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(10);
+        p1.add(rs.getChannel());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(10);
+        p1.add(rs.getTransactiondate());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+
+        p1 = getPage(6);
+        p1.add(rs.getMonday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(6);
+        p1.add(rs.getTuesday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(6);
+        p1.add(rs.getWednesday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(6);
+        p1.add(rs.getThursday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add(rs.getFriday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add(rs.getSaturday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add(rs.getSunday());
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p.setMarginTop(-13);
+        p.setPadding(0);
+        return p;
+    }
+     
+     public static void createdHeader(Document d, String logo) {
+        Paragraph p = new Paragraph();
+        Paragraph p1 = getPage(20);
+        p1.add(getImage(logo));
+        p1.setTextAlignment(TextAlignment.LEFT);
+
+        Paragraph pt = getPage(80);
+        pt.setTextAlignment(TextAlignment.CENTER);
+        pt.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        pt.add(getPage(100)
+                .add(" 3b, Tokunbo Omisore Street, Off Oyewole Olateju Lekki phase 1, Lagos Nigeria.")
+                .setBold()
+                .setFontSize(12)
+                .setTextAlignment(TextAlignment.CENTER));
+        pt.add(getPage(100)
+                .add("contact@swipe.ng, admin@swipe.ng 09060016233")
+                .setFontSize(12)
+                .setTextAlignment(TextAlignment.CENTER));
+        pt.add(getPage(70)
+                .add("Daily Transaction Report")
+                .setFontSize(16)
+                .setTextAlignment(TextAlignment.CENTER));
+
+        
+        p.add(p1);
+        p.add(pt);
+        d.add(p);
+    }
+     
+     
+    public static Paragraph createHeader2() {
+
+        Paragraph p = new Paragraph();
+        p.setWidthPercent(100);
+        Paragraph p1 = getPage(19);
+        p1.add("Name");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(19);
+        p1.add("Description");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+         p1 = getPage(9);
+        p1.add("Channel");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        
+        p1 = getPage(10);
+        p1.add("Transaction Date");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+       
+
+        p1 = getPage(6);
+        p1.add("MON");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(6);
+        p1.add("TUE");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p1 = getPage(6);
+        p1.add("WED");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add("THUR");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add("FRI");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add("SAT");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+        
+        p1 = getPage(6);
+        p1.add("SUN");
+        p1.setBold();
+        p1.setTextAlignment(TextAlignment.LEFT);
+        p1.setHorizontalAlignment(HorizontalAlignment.LEFT);
+        p.add(p1);
+
+        p.setBorderBottom(new SolidBorder(Color.convertRgbToCmyk(new DeviceRgb(74, 20, 140)), 3));
+        p.setMarginBottom(10);
+        p.setPaddingBottom(-8);
+
+        return p;
+    }
+    
+    
+     public static void createContent(Document d,List<Dailytransactionreport> list) {
+        
+        createHeader2();
+        for (Dailytransactionreport rs : list) {
+            d.add(buildBody(rs));
+        }
+        
+    }
+    
+    public static Image getImage(String path) {
+        ImageData image = null;
+        try {
+            image = ImageDataFactory.create(path);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(DailyReport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Image img = new Image(image);
+        img.scaleToFit(80, 80);
+        return img;
+    }
+    public static Paragraph getPage(float width) {
+        Paragraph p = new Paragraph();
+        p.setWidthPercent(width);
+        return p;
+        
+    }
+    
+    
+     ///////////////Excel format
+    public static ByteArrayInputStream generateDailycardReportExcel(List<Dailytransactionreport> list) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String extension = "file.xls";
+        Workbook wb = getWorkbook(extension);
+        Sheet sheet = wb.createSheet("dailytransactionReport");
+        createBody(sheet, list);
+        wb.write(out);
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+    
+    public static Workbook getWorkbook(String excelFilePath)
+            throws IOException {
+        Workbook workbook = null;
+
+        if (excelFilePath.endsWith("xlsx")) {
+            workbook = new XSSFWorkbook();
+        } else if (excelFilePath.endsWith("xls")) {
+            workbook = new HSSFWorkbook();
+        } else {
+            throw new IllegalArgumentException("The specified file is not Excel file");
+        }
+
+        return workbook;
+    }
+    
+     public static void createHeader(Row row) {
+        ReportUtil.createContent(row, null, "NAME", 0);
+        ReportUtil.createContent(row, null, "PHONE", 1);
+        ReportUtil.createContent(row, null, "EMAIL", 2);
+        ReportUtil.createContent(row, null, "DESCRIPTION", 3);
+        ReportUtil.createContent(row, null, "MONDAY", 4);
+        ReportUtil.createContent(row, null, "TUESDAY", 5);
+        ReportUtil.createContent(row, null, "WEDNESDAY", 6);
+        ReportUtil.createContent(row, null, "THURSDAY", 7);
+        ReportUtil.createContent(row, null, "FRIDAY", 8);
+        ReportUtil.createContent(row, null, "SATURDAY", 9);
+        ReportUtil.createContent(row, null, "SUNDAY", 10);
+    }
+    private static void writeReport(Dailytransactionreport rs, Row row) {
+        ReportUtil.createContent(row, null, rs.getName() + "", 0);
+        ReportUtil.createContent(row, null, rs.getPhone()+ "", 1);
+        ReportUtil.createContent(row, null, rs.getEmail() + "", 2);
+        ReportUtil.createContent(row, null, rs.getDescription()+ "", 3);
+        ReportUtil.createContent(row, null, rs.getMonday(), 4);
+        ReportUtil.createContent(row, null, rs.getTuesday(), 5);
+        ReportUtil.createContent(row, null, rs.getWednesday(), 6);
+        ReportUtil.createContent(row, null, rs.getThursday(), 7);
+        ReportUtil.createContent(row, null, rs.getFriday(), 8);
+        ReportUtil.createContent(row, null, rs.getSaturday(), 9);
+        ReportUtil.createContent(row, null, rs.getSunday(), 10);
+    }
+     public static void createBody(Sheet sheet, List<Dailytransactionreport> list) {
+        CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+        Font font = sheet.getWorkbook().createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        cellStyle.setFont(font);
+        Row rw = sheet.createRow(0);
+        createHeader(rw);
+        int rowcount = 1;
+        for (Dailytransactionreport rs : list) {
+            Row row = sheet.createRow(rowcount++);
+            writeReport(rs, row);
+        }
+
+    } 
+}
