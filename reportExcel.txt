@@ -1,0 +1,91 @@
+package swipe.ng.adminservice.components;
+
+import org.apache.poi.ss.usermodel.*;
+import swipe.ng.adminservice.dto.DetailsReport;
+import swipe.ng.adminservice.dto.ExcelRawData;
+import swipe.ng.adminservice.dto.ReportHeader;
+import swipe.ng.adminservice.utils.Utils;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ *
+ * @author odofintimothy
+ */
+public class ReportDownloader {
+    public static ByteArrayInputStream generateReport(ExcelRawData data) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        String extension = "file.xls";
+        Workbook wb = Utils.getWorkbook(extension);
+        Sheet sheet = wb.createSheet();
+        createBody(sheet, data);
+        wb.write(out);
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    private static void writeReport(DetailsReport rs, Row row) {
+        Utils.createContent(row, null, rs.getItemName(), 0);
+        Utils.createContent(row, null, Utils.getFormat(rs.getAmount()), 1);
+        if(rs.getTranDate() !=null){
+            Utils.createContent(row, null, rs.getTranDate().toString(), 2);
+        }
+    }
+
+    private static void createHeader(Row row, CellStyle style) {
+        Utils.createContent(row, style, "Item Name", 0);
+        Utils.createContent(row, style, "Amount", 1);
+        Utils.createContent(row, style, "TranDate", 2);
+        
+    }
+    private static void addHeader(Row row, CellStyle style, String name) {
+        Utils.createContent(row, style, name, 0);
+
+    }
+    private static void createReportTop(Row row, ReportHeader reportHeader, CellStyle style) {
+        Utils.createContent(row, style, "No of Categories", 0);
+        Utils.createContent(row, style, reportHeader.getNoOfCategories()+"", 1);
+
+        Utils.createContent(row, style, "Market Changes", 2);
+        Utils.createContent(row, style, reportHeader.getMarketChange()+"", 3);
+
+
+        Utils.createContent(row, null, "No of Accounts", 4);
+        Utils.createContent(row, null, reportHeader.getNoOfAccounts()+"", 5);
+
+        Utils.createContent(row, null, "No of Assets", 6);
+        Utils.createContent(row, null, reportHeader.getNoOfAssets()+"", 7);
+        Utils.createContent(row, null, "Total Amount", 8);
+        Utils.createContent(row, null, Utils.getFormat(reportHeader.getTotalAmount()), 9);
+
+    }
+
+    private static void createBody(Sheet sheet, ExcelRawData reportData) {
+        CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+        Font font = sheet.getWorkbook().createFont();
+        font.setBold(true);
+        font.setFontHeightInPoints((short) 12);
+        cellStyle.setFont(font);
+        ReportHeader header = reportData.getReportResponse().getHeader();
+        Row rw = sheet.createRow(0);
+        createReportTop(rw,header, cellStyle);
+        rw=sheet.createRow(2);
+
+        createHeader(rw,cellStyle);
+        int rowcount = 4;
+        for (Map.Entry<String, LinkedHashMap<String, DetailsReport>> rs : reportData.getQuarterMap().entrySet()) {
+            rowcount+=1;
+            Row row = sheet.createRow(rowcount);
+            addHeader(row, cellStyle, rs.getKey());
+            for(DetailsReport detailsReport:rs.getValue().values()){
+                row=sheet.createRow(rowcount++);
+                writeReport(detailsReport,row);
+            }
+        }
+
+    }
+
+}
